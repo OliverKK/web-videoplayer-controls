@@ -33,7 +33,7 @@ export const ExampleComponent = ({
       const currentPercentage = getPercentageOfVideoAlreadyPlayed(currentTime, duration);
       
       draw(currentPercentage);
-    }, 150);
+    }, 50);
   }
 
   const videoStatusCheckPeriodicallyStop = () => {
@@ -74,6 +74,7 @@ export const ExampleComponent = ({
 
   const handleStopControl = (currentVidRef:HTMLVideoElement) => {
     if (!currentVidRef) return;
+    currentVidRef.pause();
     currentVidRef.currentTime = 0;
     resetCanvas();
   }
@@ -88,10 +89,6 @@ export const ExampleComponent = ({
 
       ctx.fillStyle = "rgb(200,0,0)";
       ctx.fillRect(0, 0, widthByPercentage, height);
-
-      ctx.beginPath();
-      ctx.arc(100, 75, 50, 0, 2 * Math.PI);
-      ctx.stroke();
     } 
   }
 
