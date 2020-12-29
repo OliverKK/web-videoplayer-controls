@@ -4,7 +4,7 @@ import { ExampleComponent } from 'web-videoplayer-controls'
 import 'web-videoplayer-controls/dist/index.css'
 
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+  return <ExampleComponent />
 }
 
 export default App
