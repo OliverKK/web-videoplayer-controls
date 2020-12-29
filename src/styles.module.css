@@ -9,3 +9,10 @@
 .wvcVideo:hover {
   cursor: pointer;
 }
+
+.wvcProgressBar {
+  border: 1px solid #cdcdcd;
+  width: 100%;
+  height: 10px;
+  margin: 5px 0;
+}

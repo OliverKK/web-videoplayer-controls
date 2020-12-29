@@ -21,14 +21,18 @@ export const ExampleComponent = ({
 }: Props) => {
 
   let interval:any = undefined;
+
   const videoRef:React.RefObject<any> = React.createRef();
+  const canvasRef:React.RefObject<any> = React.createRef();
 
   const videoStatusCheckPeriodically = () => {
     const videoElement:HTMLVideoElement = videoRef.current;
 
     interval = setInterval(() => {
       const { currentTime, duration } = videoElement;
-      console.log(getPercentageOfVideoAlreadyPlayed(currentTime, duration));
+      const currentPercentage = getPercentageOfVideoAlreadyPlayed(currentTime, duration);
+      
+      draw(currentPercentage);
     }, 150);
   }
 
@@ -71,6 +75,30 @@ export const ExampleComponent = ({
   const handleStopControl = (currentVidRef:HTMLVideoElement) => {
     if (!currentVidRef) return;
     currentVidRef.currentTime = 0;
+    resetCanvas();
+  }
+
+  const draw = (percentage:number) => {
+    const canvas = canvasRef.current;
+    if (canvas.getContext) {
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const widthByPercentage = width * percentage / 100;
+      const height = canvas.height;
+
+      ctx.fillStyle = "rgb(200,0,0)";
+      ctx.fillRect(0, 0, widthByPercentage, height);
+
+      ctx.beginPath();
+      ctx.arc(100, 75, 50, 0, 2 * Math.PI);
+      ctx.stroke();
+    } 
+  }
+
+  const resetCanvas = () => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   useEffect(() => {
@@ -108,6 +136,7 @@ export const ExampleComponent = ({
         }
         This browser does not support the HTML5 video element.
       </video>
+      <canvas ref={canvasRef} id="wcv-progress-bar" className={styles.wvcProgressBar}></canvas>
       <button onClick={() => handlePlayControl(videoRef.current)}>play</button>
       <button onClick={() => handlePauseControl(videoRef.current)}>pause</button>
       <button onClick={() => handleStopControl(videoRef.current)}>stop/reset</button>
