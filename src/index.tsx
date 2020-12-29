@@ -1,16 +1,20 @@
 import React, { useEffect } from 'react'
 import styles from './styles.module.css'
 
+interface VideoObject {
+  src: string,
+  type: string
+}
+
 interface Props {
-  title?: string,
-  videos?: Array<string>,    // List of urls to videos  
+  videos?: Array<VideoObject>,
   width?: number,     
   height?: number,    
   controls?: boolean, 
 }
 
 export const ExampleComponent = ({ 
-  title = 'Web Video Player with custom contols 😄',
+  videos = [],
   width = 100,
   height = 100,
   controls = false
@@ -38,6 +42,7 @@ export const ExampleComponent = ({
 
   const handlePause = () => {
     videoStatusCheckPeriodicallyStop();
+    if(interval) clearInterval(interval);
   };
 
   const handleEnded = () => {     
@@ -47,6 +52,26 @@ export const ExampleComponent = ({
   const getPercentageOfVideoAlreadyPlayed = (current:number, duration:number) => {
     return Math.round(current * 100 / duration);
   };
+
+  const handlePlayControl = (currentVidRef:HTMLVideoElement) => {
+    if (!currentVidRef) return;
+    currentVidRef.play();
+  }
+
+  const handleTogglePlayVideoControl = (currentVidRef:HTMLVideoElement) => {
+    if (!currentVidRef) return;
+    currentVidRef.paused ? currentVidRef.play() : currentVidRef.pause()
+  }
+
+  const handlePauseControl = (currentVidRef:HTMLVideoElement) => {
+    if (!currentVidRef) return;
+    currentVidRef.pause();
+  }
+
+  const handleStopControl = (currentVidRef:HTMLVideoElement) => {
+    if (!currentVidRef) return;
+    currentVidRef.currentTime = 0;
+  }
 
   useEffect(() => {
     const currentVideoRef:HTMLVideoElement = videoRef.current;
@@ -63,13 +88,12 @@ export const ExampleComponent = ({
       if(interval) clearInterval(interval);
     }
   }, [])
-
+  
   return (
-    <div className={styles.test}>
-      <h5>{title}</h5>
+    <div className={styles.wcvVideoWrapper}>
       <video 
         className={styles.wvcVideo}
-        onClick={() => { videoRef.current.paused ? videoRef.current.play() : videoRef.current.pause() }}
+        onClick={() => handleTogglePlayVideoControl(videoRef.current) }
         ref={videoRef}
         width={`${width}%`}
         height={`${height}%`}
@@ -77,12 +101,16 @@ export const ExampleComponent = ({
         loop={false}
         muted
       >
-        <source src="https://www.odt.net/static/media/Skills-teaser.e85b7707.webm" type="video/webm" />
-        <source src="https://www.odt.net/static/media/Skills-teaser.e85b7707.mp4" type="video/mp4" />
+        {
+          videos.map(({ src, type }:VideoObject) => {
+            return <source src={src} type={type} key={`${type}-${btoa(src)}`}/>
+          })
+        }
         This browser does not support the HTML5 video element.
       </video>
-      <button onClick={() => { videoRef.current.play() }}>play</button>
-      <button onClick={() => { videoRef.current.pause() }}>pause</button>
+      <button onClick={() => handlePlayControl(videoRef.current)}>play</button>
+      <button onClick={() => handlePauseControl(videoRef.current)}>pause</button>
+      <button onClick={() => handleStopControl(videoRef.current)}>stop/reset</button>
     </div>
   )
 }
