@@ -98,9 +98,9 @@ export const ExampleComponent = ({
     }
   }
 
-  const dragEnd = (e:DragEvent) => {      
+  const dragEnd = (e:any) => {
     const videoElement:HTMLVideoElement = videoRef.current;  
-    const currentXPosition = (e.clientX - 48)
+    const currentXPosition = e.type === 'touchend' ? e.changedTouches[0].clientX - 48 : e.clientX - 48;
     const { duration } = videoElement;
     const totalWidth = progressBarWrapperRef.current.clientWidth;
     const calculatedPercentage = currentXPosition * (100 / totalWidth);
@@ -110,9 +110,7 @@ export const ExampleComponent = ({
     active = false;
     currentX = currentXPosition;
 
-    setTimeout(() => {
-      videoRef.current.play();
-    }, 500);
+    videoRef.current.play();
   }
 
   const drag = (e:any) => {
