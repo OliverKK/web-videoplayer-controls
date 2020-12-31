@@ -2,28 +2,19 @@
 .wcvVideoWrapper {
   margin: 1.5em;
 }
- 
+
 .wvcVideo:hover {
   cursor: pointer;
 }
 
-.wvcProgressBarWrapper {
-  /*border: 1px solid #cdcdcd;*/
-  display: flex;
-  width: 100%;
-  height: 20px;
-  margin: 2px 0;
-  border-radius: 2px;
-  cursor: pointer;
-}
-
 .wvcProgressBar {
-  border-radius: 2px; 
+  border-radius: 2px;
   background-color: #cdcdcd;
   height: 5px;
   margin-top: 8px;
   width: 100%;
   cursor: pointer;
+  transition: border 0.01s linear;
 }
 
 .wvcDot {
@@ -32,7 +23,8 @@
   position: absolute;
   background-color: #ff8282;
   border-radius: 50%;
-  margin-left: 0;
+  margin-left: -5px;
+  transition: transform 0.01s linear;
 }
 
 .wvcDot:hover {

@@ -1,5 +1,49 @@
 import React, { useEffect } from 'react'
+
+import { FaPlay } from 'react-icons/fa';
+import { FaPause } from 'react-icons/fa';
+import { FaStop } from 'react-icons/fa';
+
+import styled from 'styled-components';
+
+import '@csstools/normalize.css';
 import styles from './styles.module.css'
+
+const ProgressBarWrapper = styled.div`
+  display: flex;
+  width: calc(100% - 0.5em);
+  height: 20px;
+  margin: 0.5em auto;
+  border-radius: 0.5em;
+  cursor: pointer;
+`;
+
+const Button = styled.button`
+  background: transparent;
+  border-radius: 3px;
+  border: 2px solid #cdcdcd;
+  color: #cdcdcd;
+  margin: 0.5em 0.5em 0.5em 0;
+  padding: 0.25em 1em;
+
+  &:hover {
+    border: 2px solid #000;
+    color: #000;
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    background-color: #505050;
+  }
+
+  svg {
+    margin-top: 3px;
+  }
+`;
 
 interface VideoObject {
   src: string,
@@ -22,6 +66,7 @@ export const ExampleComponent = ({
 
   let active = false;
   let currentX = 0;
+  let playedTime = 0;
 
   const videoRef:React.RefObject<any> = React.createRef();
   const progressBarWrapperRef:React.RefObject<any> = React.createRef();
@@ -57,7 +102,10 @@ export const ExampleComponent = ({
     setTranslate(calculatedWidth, progressBarDotRef.current);
   }
 
-  const handleTimeUpdate = () => {   
+  const handleTimeUpdate = () => {
+    const currentVidRef:HTMLVideoElement = videoRef.current;
+    playedTime = currentVidRef.currentTime;
+
     const currentPercentage = getPercentageOfPlayedVideo();
     paintProgressBar(currentPercentage);
     moveProgressBarDot(currentPercentage);
@@ -65,17 +113,21 @@ export const ExampleComponent = ({
 
   const handlePlayControl = (currentVidRef:HTMLVideoElement) => {
     if (!currentVidRef) return;
+    const dot = progressBarDotRef.current;
+    dot.style.transition = 'transform 1s linear';
     currentVidRef.play();
   }
 
   const handleTogglePlayVideoControl = (currentVidRef:HTMLVideoElement) => {
     if (!currentVidRef) return;
-    currentVidRef.paused ? currentVidRef.play() : currentVidRef.pause()
+    currentVidRef.paused ? handlePlayControl(currentVidRef) : handlePauseControl(currentVidRef)
   }
 
   const handlePauseControl = (currentVidRef:HTMLVideoElement) => {
     if (!currentVidRef) return;
     currentVidRef.pause();
+    const dot = progressBarDotRef.current;
+    dot.style.transition = 'transform 0.01s linear';
   }
 
   const handleStopControl = (currentVidRef:HTMLVideoElement) => {
@@ -116,8 +168,8 @@ export const ExampleComponent = ({
   const drag = (e:any) => {
     if (active) {
       e.preventDefault();
-      const dragItem = progressBarDotRef.current;
-    
+      const dot = progressBarDotRef.current;
+
       if (e.type === 'touchmove') {
         currentX = e.touches[0].clientX - 48;
       } else {
@@ -125,7 +177,7 @@ export const ExampleComponent = ({
       }
       
       paintProgressBar(getPercentageOfPlayedVideoByCurrentPosition(currentX));
-      setTranslate(currentX, dragItem);
+      setTranslate(currentX, dot);
     }
   }
 
@@ -176,7 +228,7 @@ export const ExampleComponent = ({
         }
         This browser does not support the HTML5 video element.
       </video>
-      <div 
+      <ProgressBarWrapper
         ref={progressBarWrapperRef} 
         className={styles.wvcProgressBarWrapper}
         
@@ -187,10 +239,13 @@ export const ExampleComponent = ({
         
         />
         <span ref={progressBarDotRef} className={styles.wvcDot}></span>
-      </div>      
-      <button onClick={() => handlePlayControl(videoRef.current)}>play</button>
-      <button onClick={() => handlePauseControl(videoRef.current)}>pause</button>
-      <button onClick={() => handleStopControl(videoRef.current)}>stop/reset</button>
+      </ProgressBarWrapper>
+      <Button onClick={() => handlePlayControl(videoRef.current)}><FaPlay /></Button>
+      <Button onClick={() => handlePauseControl(videoRef.current)}><FaPause /></Button>
+      <Button onClick={() => handleStopControl(videoRef.current)}><FaStop /></Button>
+      <p>
+        <span>playedTime: {playedTime}</span>
+      </p>
     </div>
   )
 }
