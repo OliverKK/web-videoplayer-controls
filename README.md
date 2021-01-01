@@ -25,6 +25,13 @@ class Example extends Component {
 }
 ```
 
+## ToDo
+* get rid of ref
+* use redux
+* add theme
+* add progress loader
+* add buffer progress bar
+
 ## License
 
 MIT © [OliverKK](https://github.com/OliverKK)
