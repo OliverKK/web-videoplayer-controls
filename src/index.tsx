@@ -4,46 +4,11 @@ import { FaPlay } from 'react-icons/fa';
 import { FaPause } from 'react-icons/fa';
 import { FaStop } from 'react-icons/fa';
 
-import styled from 'styled-components';
-
 import '@csstools/normalize.css';
-import styles from './styles.module.css'
-
-const ProgressBarWrapper = styled.div`
-  display: flex;
-  width: calc(100% - 0.5em);
-  height: 20px;
-  margin: 0.5em auto;
-  border-radius: 0.5em;
-  cursor: pointer;
-`;
-
-const Button = styled.button`
-  background: transparent;
-  border-radius: 3px;
-  border: 2px solid #cdcdcd;
-  color: #cdcdcd;
-  margin: 0.5em 0.5em 0.5em 0;
-  padding: 0.25em 1em;
-
-  &:hover {
-    border: 2px solid #000;
-    color: #000;
-    cursor: pointer;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:active {
-    background-color: #505050;
-  }
-
-  svg {
-    margin-top: 3px;
-  }
-`;
+import {
+  Video, VideoWrapper, Dot,
+  ProgressBar, ProgressBarWrapper, Button
+} from './styles'
 
 interface VideoObject {
   src: string,
@@ -52,21 +17,22 @@ interface VideoObject {
 
 interface Props {
   videos?: Array<VideoObject>,
-  width?: string,     
-  height?: string,    
-  controls?: boolean, 
+  width?: string,
+  height?: string,
+  controls?: boolean,
+  poster?: string,
 }
 
-export const ExampleComponent = ({ 
+export const ExampleComponent = ({
   videos = [],
   width = '100%',
   height = '100%',
-  controls = false 
+  controls = false,
+  poster = '',
 }: Props) => {
 
   let active = false;
   let currentX = 0;
-  let playedTime = 0;
 
   const videoRef:React.RefObject<any> = React.createRef();
   const progressBarWrapperRef:React.RefObject<any> = React.createRef();
@@ -74,7 +40,7 @@ export const ExampleComponent = ({
   const progressBarDotRef:React.RefObject<any> = React.createRef();
 
   const getPercentageOfPlayedVideo = () => {
-    const videoElement:HTMLVideoElement = videoRef.current;  
+    const videoElement:HTMLVideoElement = videoRef.current;
     const { currentTime, duration } = videoElement;
     const currentPercentage = Math.round(currentTime * 100 / duration);
 
@@ -103,9 +69,6 @@ export const ExampleComponent = ({
   }
 
   const handleTimeUpdate = () => {
-    const currentVidRef:HTMLVideoElement = videoRef.current;
-    playedTime = currentVidRef.currentTime;
-
     const currentPercentage = getPercentageOfPlayedVideo();
     paintProgressBar(currentPercentage);
     moveProgressBarDot(currentPercentage);
@@ -151,7 +114,7 @@ export const ExampleComponent = ({
   }
 
   const dragEnd = (e:any) => {
-    const videoElement:HTMLVideoElement = videoRef.current;  
+    const videoElement:HTMLVideoElement = videoRef.current;
     const currentXPosition = e.type === 'touchend' ? e.changedTouches[0].clientX - 48 : e.clientX - 48;
     const { duration } = videoElement;
     const totalWidth = progressBarWrapperRef.current.clientWidth;
@@ -175,14 +138,14 @@ export const ExampleComponent = ({
       } else {
         currentX = e.clientX - 48;
       }
-      
+
       paintProgressBar(getPercentageOfPlayedVideoByCurrentPosition(currentX));
       setTranslate(currentX, dot);
     }
   }
 
   const setTranslate = (xPos:number, el:any) => {
-    const minX = 0; 
+    const minX = 0;
     const maxX = progressBarWrapperRef.current.clientWidth;
 
     if (xPos >= minX && xPos <= maxX) {
@@ -196,29 +159,29 @@ export const ExampleComponent = ({
 
     currentVideoRef.addEventListener('timeupdate', handleTimeUpdate, true);
 
-    progressBarWrapperRefCurrent.addEventListener('touchstart', dragStart, false);
-    progressBarWrapperRefCurrent.addEventListener('touchend', dragEnd, false);
-    progressBarWrapperRefCurrent.addEventListener('touchmove', drag, false);
+    progressBarWrapperRefCurrent.addEventListener('touchstart', dragStart, true);
+    progressBarWrapperRefCurrent.addEventListener('touchend', dragEnd, true);
+    progressBarWrapperRefCurrent.addEventListener('touchmove', drag, true);
 
-    progressBarWrapperRefCurrent.addEventListener('mousedown', dragStart, false);
-    progressBarWrapperRefCurrent.addEventListener('mouseup', dragEnd, false);
-    progressBarWrapperRefCurrent.addEventListener('mousemove', drag, false);
+    progressBarWrapperRefCurrent.addEventListener('mousedown', dragStart, true);
+    progressBarWrapperRefCurrent.addEventListener('mouseup', dragEnd, true);
+    progressBarWrapperRefCurrent.addEventListener('mousemove', drag, true);
 
     return () => {
       currentVideoRef.removeEventListener('timeupdate', handleTimeUpdate, true);
     }
   }, [])
-  
+
   return (
-    <div className={styles.wcvVideoWrapper}>
-      <video 
-        className={styles.wvcVideo}
+    <VideoWrapper>
+      <Video
         onClick={() => handleTogglePlayVideoControl(videoRef.current) }
         ref={videoRef}
         width={width}
         height={height}
         controls={controls}
         loop={false}
+        poster={poster}
         muted
       >
         {
@@ -227,25 +190,14 @@ export const ExampleComponent = ({
           })
         }
         This browser does not support the HTML5 video element.
-      </video>
-      <ProgressBarWrapper
-        ref={progressBarWrapperRef} 
-        className={styles.wvcProgressBarWrapper}
-        
-      >
-        <div 
-          ref={progressBarRef} 
-          className={styles.wvcProgressBar} 
-        
-        />
-        <span ref={progressBarDotRef} className={styles.wvcDot}></span>
+      </Video>
+      <ProgressBarWrapper ref={progressBarWrapperRef} >
+        <ProgressBar ref={progressBarRef} />
+        <Dot ref={progressBarDotRef} />
       </ProgressBarWrapper>
       <Button onClick={() => handlePlayControl(videoRef.current)}><FaPlay /></Button>
       <Button onClick={() => handlePauseControl(videoRef.current)}><FaPause /></Button>
       <Button onClick={() => handleStopControl(videoRef.current)}><FaStop /></Button>
-      <p>
-        <span>playedTime: {playedTime}</span>
-      </p>
-    </div>
+    </VideoWrapper>
   )
 }

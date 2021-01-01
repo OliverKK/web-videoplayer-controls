@@ -13,8 +13,15 @@ const videos = [{
   type: 'video/mp4'
 }]
 
+const poster = 'https://geezee.de/img/slides/showcase_new.jpg';
+
 const App = () => {
-  return <ExampleComponent videos={videos} />
+  return (
+    <ExampleComponent
+      videos={videos}
+      poster={poster}
+    />
+  )
 }
 
 export default App
