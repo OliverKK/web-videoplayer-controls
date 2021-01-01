@@ -31,6 +31,7 @@ class Example extends Component {
 * add theme
 * add progress loader
 * add buffer progress bar
+* add times (played, duration)
 
 ## License
 
